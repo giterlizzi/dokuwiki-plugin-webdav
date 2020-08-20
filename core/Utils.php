@@ -140,7 +140,7 @@ class Utils
             $item['mtime'] = filemtime("$base/$file");
         } else {
             $item['path']      = (!empty($opts['dir']) && $opts['dir'] == 'mediadir') ? mediaFN($item['id']) : wikiFN($item['id']);
-            $item['mime_type'] = (!empty($opts['dir']) && $opts['dir'] == 'mediadir') ? mime_content_type($item['path']) : 'text/plain';
+            $item['mime_type'] = (!empty($opts['dir']) && $opts['dir'] == 'mediadir') ? mime_content_type($item['path']) : null;
             $item['ns']        = getNS($item['id']);
             $item['size']      = filesize($item['path']);
             $item['mtime']     = filemtime($item['path']);
