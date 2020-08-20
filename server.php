@@ -28,7 +28,7 @@ $doku_inc_dirs = [
     '/usr/share/webapps/dokuwiki',
     '/usr/share/dokuwiki',
     '/app/dokuwiki',
-    realpath(dirname(__FILE__) . '/../../../../'), # Default DokuWiki path
+    realpath(dirname(__FILE__) . '/../../../'), # Default DokuWiki path
 ];
 
 # Load doku_inc.php file
