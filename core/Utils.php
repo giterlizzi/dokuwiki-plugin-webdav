@@ -125,6 +125,18 @@ class Utils
         saveWikiText($id, $text, $summary, false);
     }
 
+    /**
+     * Search callback
+     *
+     * @param array $data
+     * @param string $base
+     * @param string $file
+     * @param string $type
+     * @param integer $lvl
+     * @param array $opts
+     *
+     * @return array
+     */
     public static function searchCallback(&$data, $base, $file, $type, $lvl, $opts = [])
     {
         $item = [];
@@ -147,6 +159,17 @@ class Utils
             $item['perm']      = auth_quickaclcheck($item['id']);
             $item['hash']      = sha1_file($item['path']);
             $item['file']      = basename($file);
+        }
+
+        $item['filename'] = $item['file'];
+        $item['metafile'] = null;
+
+        $metafile = mediametaFN($item['id'], '.filename');
+
+        if (file_exists($metafile)) {
+            $item['metafile'] = $metafile;
+            $meta             = unserialize(io_readFile($metafile, false));
+            $item['filename'] = empty($meta['filename']) ? null : $meta['filename'];
         }
 
         if ($item['perm'] < AUTH_READ) {
@@ -189,7 +212,7 @@ class Utils
      * @param string $message
      * @param array  $context
      */
-    public function log($level, $message, $context = [])
+    public static function log($level, $message, $context = [])
     {
         // "{category} [{user}] [{ip}] [{level}] {message}"
 

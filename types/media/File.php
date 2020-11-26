@@ -2,8 +2,8 @@
 
 namespace dokuwiki\plugin\webdav\types\media;
 
-use Sabre\DAV;
 use dokuwiki\plugin\webdav\core;
+use Sabre\DAV;
 
 class File extends core\File
 {
@@ -16,6 +16,10 @@ class File extends core\File
         }
 
         $res = media_delete($this->info['id'], $acl_check);
+
+        if ($metafile = $this->info['metafile']) {
+            @unlink($this->info['metafile']);
+        }
 
         if ($res == DOKU_MEDIA_DELETED) {
             return true;
@@ -64,9 +68,13 @@ class File extends core\File
 
         io_createNamespace($this->info['id'], 'media');
 
-        if (!$this->streamWriter($stream, $this->info['path'])) {
+        if (!core\Utils::streamWriter($stream, $this->info['path'])) {
             throw new DAV\Exception\Forbidden($lang['uploadfail']);
         }
+
+        io_saveFile($this->info['metafile'], serialize([
+            'filename' => $this->info['filename'],
+        ]));
 
         $timestamp_new = @filemtime($this->info['path']);
         $filesize_new  = filesize($this->info['path']);

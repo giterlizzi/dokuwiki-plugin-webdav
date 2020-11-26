@@ -50,7 +50,16 @@ class Directory extends core\Directory
 
     public function createFile($name, $data = null)
     {
-        $file = new MediaFile($this->info['id'] . ":$name");
+        $info = $this->info;
+
+        $info['id']       = $this->info['id'] . ':' . cleanID($name);
+        $info['path']     = mediaFN($info['id']);
+        $info['perm']     = auth_quickaclcheck($info['id']);
+        $info['type']     = 'f';
+        $info['filename'] = $name;
+        $info['metafile'] = mediametaFN($info['id'], '.filename');
+
+        $file = new File($info);
         $file->put($data);
     }
 }

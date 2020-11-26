@@ -49,14 +49,14 @@ class File extends DAV\File
      */
     public function getName()
     {
-        return $this->info['file'];
+        return $this->info['filename'];
     }
 
     /**
      * Renames the node
      *
      * @todo Implement or use Move Plugin
-     * 
+     *
      * @param string $name The new name
      *
      * @throws DAV\Exception\Forbidden
@@ -104,6 +104,6 @@ class File extends DAV\File
      */
     public function getContentType()
     {
-        return $this->info['mime_type'];
+        return @$this->info['mime_type'];
     }
 }

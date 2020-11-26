@@ -18,11 +18,22 @@ class action_plugin_webdav extends DokuWiki_Action_Plugin
     {
         if (plugin_load('renderer', 'odt_book')) {
             $controller->register_hook('PLUGIN_WEBDAV_COLLECTIONS', 'BEFORE', $this, 'odt_plugin');
+            $controller->register_hook('MEDIA_DELETE_FILE', 'AFTER', $this, 'delete_meta');
         }
     }
 
     public function odt_plugin(Doku_Event $event, $param)
     {
         $event->data['odt'] = new dokuwiki\plugin\webdav\types\odt\Directory();
+    }
+
+    public function delete_meta(Doku_Event $event)
+    {
+        $id       = $event->data['id'];
+        $metafile = mediametaFN($id, '.filename');
+
+        if (@unlink($metafile)) {
+            io_sweepNS($id, 'metadir');
+        }
     }
 }

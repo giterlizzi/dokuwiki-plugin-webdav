@@ -110,13 +110,14 @@ try {
         $plugins['Auth'] = new Sabre\DAV\Auth\Plugin($auth_backend);
     }
 
-    Utils::log('debug', 'Loaded {collections} collections', ['collections' => implode(', ', array_keys($collections))]);
+    Utils::log('debug', 'Loaded collections: {collections}', ['collections' => implode(', ', array_keys($collections))]);
 
     # Trigger PLUGIN_WEBDAV_PLUGINS event for add custom plugins
     trigger_event('PLUGIN_WEBDAV_PLUGINS', $plugins, null, false);
 
+    Utils::log('debug', 'Loaded plugins: {plugins}', ['plugins' => implode(', ', array_keys($plugins))]);
+
     foreach ($plugins as $name => $plugin) {
-        Utils::log('debug', 'Loaded {name} plugin', ['name' => $name]);
         $server->addPlugin($plugin);
     }
 
@@ -130,3 +131,5 @@ try {
 } catch (Exception $e) {
     Utils::log('error', $e->getMessage());
 }
+
+Utils::log('debug', '====================');
