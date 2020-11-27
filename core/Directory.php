@@ -23,7 +23,7 @@ class Directory extends DAV\Collection
     public function __construct($info = [])
     {
 
-        if (! static::ROOT || ! static::DIRECTORY) {
+        if (!static::ROOT || !static::DIRECTORY) {
             throw new \RuntimeException('Specify ROOT and DIRECTORY constant');
         }
 

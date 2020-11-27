@@ -38,5 +38,4 @@ class helper_plugin_webdav extends DokuWiki_Plugin
 
         return auth_isMember($this->getConf('remoteuser'), $INPUT->server->str('REMOTE_USER'), (array) $USERINFO['grps']);
     }
-
 }

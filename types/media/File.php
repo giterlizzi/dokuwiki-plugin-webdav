@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * DokuWiki WebDAV Plugin - Media File Type
+ *
+ * @link     https://dokuwiki.org/plugin:webdav
+ * @author   Giuseppe Di Terlizzi <giuseppe.diterlizzi@gmail.com>
+ * @license  GPL 2 (http://www.gnu.org/licenses/gpl.html)
+ */
+
 namespace dokuwiki\plugin\webdav\types\media;
 
 use dokuwiki\plugin\webdav\core;
@@ -18,7 +26,7 @@ class File extends core\File
         $res = media_delete($this->info['id'], $acl_check);
 
         if ($metafile = $this->info['metafile']) {
-            @unlink($this->info['metafile']);
+            @unlink($metafile);
         }
 
         if ($res == DOKU_MEDIA_DELETED) {

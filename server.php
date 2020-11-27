@@ -72,6 +72,8 @@ try {
     # Trigger PLUGIN_WEBDAV_COLLECTIONS event for add custom collections
     trigger_event('PLUGIN_WEBDAV_COLLECTIONS', $collections, null, false);
 
+    Utils::log('debug', 'Loaded collections: {collections}', ['collections' => implode(', ', array_keys($collections))]);
+
     # Fix MS Office Lockroot issue
     # see: https://sabre.io/dav/clients/msoffice/
 
@@ -109,8 +111,6 @@ try {
 
         $plugins['Auth'] = new Sabre\DAV\Auth\Plugin($auth_backend);
     }
-
-    Utils::log('debug', 'Loaded collections: {collections}', ['collections' => implode(', ', array_keys($collections))]);
 
     # Trigger PLUGIN_WEBDAV_PLUGINS event for add custom plugins
     trigger_event('PLUGIN_WEBDAV_PLUGINS', $plugins, null, false);

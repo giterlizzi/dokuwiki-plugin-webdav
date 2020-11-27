@@ -1,18 +1,26 @@
 <?php
 
+/**
+ * DokuWiki WebDAV Plugin - ODT File Type
+ *
+ * @link     https://dokuwiki.org/plugin:webdav
+ * @author   Giuseppe Di Terlizzi <giuseppe.diterlizzi@gmail.com>
+ * @license  GPL 2 (http://www.gnu.org/licenses/gpl.html)
+ */
+
 namespace dokuwiki\plugin\webdav\types\odt;
 
-use Sabre\DAV;
 use dokuwiki\plugin\webdav\core;
+use Sabre\DAV;
 
 class File extends core\File
 {
 
     /**
      * Return the rendered ODT document
-     * 
+     *
      * @todo Use the cache
-     * 
+     *
      * @return string
      */
     public function get()
@@ -43,9 +51,9 @@ class File extends core\File
 
     /**
      * Return the size of document
-     * 
+     *
      * @todo This is a workarund (always zero?)
-     * 
+     *
      * @return int
      */
     public function getSize()
