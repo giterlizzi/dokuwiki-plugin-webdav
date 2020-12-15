@@ -1,0 +1,3 @@
+====== WebDAV =======
+
+Use this page to monitor some WebDAV plugin feaures. To enable some functionality use [[this>doku.php?do=admin&page=config#plugin____webdav____plugin_settings_name|WebDAV Plugin Settings]] in Extension Manager.

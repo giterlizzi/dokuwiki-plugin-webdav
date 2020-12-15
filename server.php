@@ -57,10 +57,6 @@ global $conf;
 
 $helper = plugin_load('helper', 'webdav');
 
-set_exception_handler(function ($exception) {
-    Utils::log('error', '[{class}] {message}', ['class' => get_class($exception), 'message' => $exception->getMessage()]);
-});
-
 try {
 
     # Add pages and media collections
@@ -85,12 +81,16 @@ try {
 
     $server->setBaseUri(DOKU_REL . 'lib/plugins/webdav/server.php');
 
+    # Hide SabreDAV version
+    $server::$exposeVersion              = false;
+    $server->enablePropfindDepthInfinity = true;
+
     $plugins = [
-        'Browser'             => new Sabre\DAV\Browser\Plugin(),
         'Mount'               => new Sabre\DAV\Mount\Plugin(),
-        'Locks'               => new Sabre\DAV\Locks\Plugin(new \Sabre\DAV\Locks\Backend\File($conf['cachedir'] . '/webdav.lock')),
+        'Locks'               => new Sabre\DAV\Locks\Plugin(new dokuwiki\plugin\webdav\core\LocksFileBackend($conf['cachedir'] . '/webdav.lock')),
         'TemporaryFileFilter' => new Sabre\DAV\TemporaryFileFilterPlugin($conf['tmpdir'] . '/webdav'),
-        'DokuWiki'            => new dokuwiki\plugin\webdav\core\Plugin(),
+        'DokuWiki'            => new dokuwiki\plugin\webdav\core\DokuWikiPlugin(),
+        'Exception'           => new dokuwiki\plugin\webdav\core\ExceptionPlugin(),
     ];
 
     $extra_tmp_file_patterns = [
@@ -99,9 +99,22 @@ try {
         '/^.*\.wbk$/', // Word backup files
     ];
 
-    // # Add extra temporary file patterns
+    # Add extra temporary file patterns
     foreach ($extra_tmp_file_patterns as $pattern) {
         $plugins['TemporaryFileFilter']->temporaryFilePatterns[] = $pattern;
+    }
+
+    # Add browser plugin
+    if ($helper->getConf('browser_plugin')) {
+        $plugins['Browser'] = new Sabre\DAV\Browser\Plugin();
+    } else {
+        $plugins['DummyGetResponsePlugin'] = new dokuwiki\plugin\webdav\core\DummyGetResponsePlugin();
+    }
+
+    # Some WebDAV clients do require Class 2 WebDAV support (locking), since
+    # we do not provide locking we emulate it using a fake locking plugin.
+    if (preg_match('/(WebDAVFS|OneNote|Microsoft-WebDAV)/', $_SERVER['HTTP_USER_AGENT'])) {
+        $plugins['FakeLockerPlugin'] = new dokuwiki\plugin\webdav\core\FakeLockerPlugin();
     }
 
     # Enable Basic Authentication
@@ -129,7 +142,12 @@ try {
     $server->exec();
 
 } catch (Exception $e) {
-    Utils::log('error', $e->getMessage());
+    Utils::log('fatal', "[{class}] {message} in {file}({line})", [
+        'class'   => get_class($e),
+        'message' => $e->getMessage(),
+        'file'    => $e->getFile(),
+        'line'    => $e->getLine(),
+    ]);
 }
 
 Utils::log('debug', '====================');

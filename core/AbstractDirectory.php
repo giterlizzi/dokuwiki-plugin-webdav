@@ -10,14 +10,14 @@
 
 namespace dokuwiki\plugin\webdav\core;
 
-use Sabre\DAV;
+use Sabre\DAV\Collection;
 
-class Directory extends DAV\Collection
+class AbstractDirectory extends Collection
 {
     const ROOT      = null;
     const DIRECTORY = null;
 
-    protected $info = [];
+    public $info = [];
 
     /** @inheritdoc */
     public function __construct($info = [])
@@ -33,7 +33,7 @@ class Directory extends DAV\Collection
     /** @inheritdoc */
     public function getName()
     {
-        return (isset($this->info['id']) ? noNS($this->info['id']) : static::ROOT);
+        return (isset($this->info['dirname']) ? noNS($this->info['dirname']) : static::ROOT);
     }
 
     /** @inheritdoc */

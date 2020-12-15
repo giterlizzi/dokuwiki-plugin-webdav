@@ -10,10 +10,10 @@
 
 namespace dokuwiki\plugin\webdav\core;
 
-use Sabre\DAV;
-use dokuwiki\plugin\webdav\core;
+use dokuwiki\plugin\webdav\core\Utils;
+use Sabre\DAV\Auth\Backend\AbstractBasic;
 
-class Auth extends DAV\Auth\Backend\AbstractBasic
+class Auth extends AbstractBasic
 {
     /**
      * Validate user credential
@@ -31,13 +31,13 @@ class Auth extends DAV\Auth\Backend\AbstractBasic
 
         $check = $auth->checkPass($username, $password);
 
-        core\Utils::log('debug', '[Auth] {check} password for {username} user', [
+        Utils::log('debug', '[Auth] {check} password for {username} user', [
             'username' => $username,
             'check'    => ($check ? 'Valid' : 'Invalid'),
         ]);
 
         if (!$helper->hasAccess()) {
-            core\Utils::log('debug', '[Auth] Access denied. See WebDAV "remoteuser" config');
+            Utils::log('debug', '[Auth] Access denied. See WebDAV "remoteuser" config');
             return false;
         }
 

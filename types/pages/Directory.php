@@ -10,9 +10,12 @@
 
 namespace dokuwiki\plugin\webdav\types\pages;
 
-use dokuwiki\plugin\webdav\core;
+use dokuwiki\plugin\webdav;
+use dokuwiki\plugin\webdav\core\Utils;
+use Sabre\DAV\Exception\Forbidden;
+use Sabre\DAV\Exception\NotFound;
 
-class Directory extends core\Directory
+class Directory extends webdav\core\AbstractDirectory
 {
     const ROOT      = 'pages';
     const DIRECTORY = 'datadir';
@@ -21,10 +24,10 @@ class Directory extends core\Directory
     {
         global $conf;
 
-        core\Utils::log('debug', "Create directory $name");
+        Utils::log('debug', "Create directory $name");
 
         if (auth_quickaclcheck($this->ns . ':*') < AUTH_CREATE) {
-            throw new DAV\Exception\Forbidden('Insufficient Permissions');
+            throw new Forbidden('Insufficient Permissions');
         }
 
         // no dir hierarchies
@@ -43,28 +46,28 @@ class Directory extends core\Directory
     {
         $dir = dirname(wikiFN($this->info['ns'] . ':fake'));
 
-        core\Utils::log('debug', "Delete directory");
+        Utils::log('debug', "Delete directory");
 
         if (@!file_exists($dir)) {
-            throw new DAV\Exception\NotFound('Directory does not exist');
+            throw new NotFound('Directory does not exist');
         }
 
         $files = glob("$dir/*");
 
         if (count($files)) {
-            throw new DAV\Exception\Forbidden('Directory not empty');
+            throw new Forbidden('Directory not empty');
         }
 
         if (!rmdir($dir)) {
-            throw new DAV\Exception\Forbidden('Failed to delete directory');
+            throw new Forbidden('Failed to delete directory');
         }
     }
 
     public function createFile($name, $data = null)
     {
         $id = $this->info['ns'] . ':' . preg_replace('#\.txt$#', '', cleanID($name));
-        core\Utils::log('debug', "Create page $id - $name");
+        Utils::log('debug', "Create page $id - $name");
 
-        core\Utils::saveWikiText($id, $data, 'create');
+        Utils::saveWikiText($id, $data, 'create');
     }
 }

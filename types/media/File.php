@@ -10,31 +10,34 @@
 
 namespace dokuwiki\plugin\webdav\types\media;
 
-use dokuwiki\plugin\webdav\core;
-use Sabre\DAV;
+use dokuwiki\plugin\webdav\core\AbstractFile;
+use dokuwiki\plugin\webdav\core\Utils;
+use Sabre\DAV\Exception\Forbidden;
+use Sabre\DAV\Exception\UnsupportedMediaType;
 
-class File extends core\File
+class File extends AbstractFile
 {
     public function delete()
     {
-        core\Utils::log('debug', 'Delete media');
+        Utils::log('debug', 'Delete media');
 
         if ($this->info['perm'] < AUTH_DELETE) {
-            throw new DAV\Exception\Forbidden('You are not allowed to delete this file');
+            throw new Forbidden('You are not allowed to delete this file');
         }
 
         $res = media_delete($this->info['id'], $acl_check);
 
-        if ($metafile = $this->info['metafile']) {
-            @unlink($metafile);
-        }
+        // TODO remove metafile in attic ?
+        //if ($metafile = $this->info['metafile']) {
+        //    @unlink($metafile);
+        //}
 
         if ($res == DOKU_MEDIA_DELETED) {
             return true;
         }
 
         if ($res == DOKU_MEDIA_INUSE) {
-            throw new DAV\Exception\Forbidden('Media file in use');
+            throw new Forbidden('Media file in use');
         }
     }
 
@@ -50,7 +53,7 @@ class File extends core\File
         }
 
         if ($this->info['perm'] < $perm_needed) {
-            throw new DAV\Exception\Forbidden('Insufficient Permissions');
+            throw new Forbidden('Insufficient Permissions');
         }
 
         $overwrite     = file_exists($this->info['path']);
@@ -67,19 +70,20 @@ class File extends core\File
         );
         $regex = join('|', $types);
 
-        core\Utils::log('debug', "Allowed files $regex");
+        Utils::log('debug', "Allowed files $regex");
 
         // check valid file type
         if (!preg_match('/\.(' . $regex . ')$/i', $this->info['path'])) {
-            throw new DAV\Exception\Forbidden($lang['uploadwrong']);
+            throw new UnsupportedMediaType($lang['uploadwrong']);
         }
 
         io_createNamespace($this->info['id'], 'media');
 
-        if (!core\Utils::streamWriter($stream, $this->info['path'])) {
-            throw new DAV\Exception\Forbidden($lang['uploadfail']);
+        if (!Utils::streamWriter($stream, $this->info['path'])) {
+            throw new Forbidden($lang['uploadfail']);
         }
 
+        // save the original filename
         io_saveFile($this->info['metafile'], serialize([
             'filename' => $this->info['filename'],
         ]));
@@ -88,7 +92,12 @@ class File extends core\File
         $filesize_new  = filesize($this->info['path']);
         $sizechange    = $filesize_new - $filesize_old;
 
-        media_notify($this->info['id'], $this->info['path'], $this->getContentType(), $timestamp_old);
+        if (!file_exists(mediaFN($this->info['id'], $timestamp_old)) && file_exists($this->info['path'])) {
+            // add old revision to the attic if missing
+            media_saveOldRevision($this->info['id']);
+        }
+
+        media_notify($this->info['id'], $this->info['path'], $this->getContentType(), $timestamp_old, $timestamp_new);
 
         // write entry in media log
         if ($overwrite) {

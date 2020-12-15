@@ -10,7 +10,7 @@
 
 namespace dokuwiki\plugin\webdav\core;
 
-use Sabre\DAV;
+use Sabre\DAV\Exception\Forbidden;
 
 class Utils
 {
@@ -102,11 +102,11 @@ class Utils
 
         // check ACL permissions
         if (auth_quickaclcheck($id) < $auth_permission) {
-            throw new DAV\Exception\Forbidden('Insufficient Permissions');
+            throw new Forbidden('Insufficient Permissions');
         }
 
         if (!utf8_check($text)) {
-            throw new DAV\Exception\Forbidden('Seems not to be valid UTF-8 text');
+            throw new Forbidden('Seems not to be valid UTF-8 text');
         }
 
         switch ($mode) {
@@ -145,6 +145,7 @@ class Utils
 
         $item['id']   = pathID($file, $is_dir);
         $item['type'] = $type;
+        $item['dir']  = $opts['dir'];
 
         if ($is_dir) {
             $item['perm']  = auth_quickaclcheck($item['id'] . ':*');
@@ -162,14 +163,24 @@ class Utils
         }
 
         $item['filename'] = $item['file'];
+        $item['dirname']  = $item['ns'];
+
         $item['metafile'] = null;
+        $item['metadir']  = null;
 
         $metafile = mediametaFN($item['id'], '.filename');
+        $metadir  = mediametaFN($item['ns'], '.dirname');
 
         if (file_exists($metafile)) {
             $item['metafile'] = $metafile;
             $meta             = unserialize(io_readFile($metafile, false));
             $item['filename'] = empty($meta['filename']) ? null : $meta['filename'];
+        }
+
+        if (file_exists($metadir)) {
+            $item['metadir'] = $metadir;
+            $meta            = unserialize(io_readFile($metadir, false));
+            $item['dirname'] = empty($meta['dirname']) ? null : $meta['dirname'];
         }
 
         if ($item['perm'] < AUTH_READ) {

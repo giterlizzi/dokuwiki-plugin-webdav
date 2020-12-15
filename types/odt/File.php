@@ -10,10 +10,10 @@
 
 namespace dokuwiki\plugin\webdav\types\odt;
 
-use dokuwiki\plugin\webdav\core;
-use Sabre\DAV;
+use dokuwiki\plugin\webdav\core\AbstractFile;
+use Sabre\DAV\Exception\Forbidden;
 
-class File extends core\File
+class File extends AbstractFile
 {
 
     /**
@@ -26,7 +26,7 @@ class File extends core\File
     public function get()
     {
         if (auth_quickaclcheck($this->info['id']) < AUTH_READ) {
-            throw new DAV\Exception\Forbidden('You are not allowed to access this file');
+            throw new Forbidden('You are not allowed to access this file');
         }
 
         $odt      = plugin_load('renderer', 'odt_book');

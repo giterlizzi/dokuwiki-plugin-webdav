@@ -10,9 +10,9 @@
 
 namespace dokuwiki\plugin\webdav\types\odt;
 
-use dokuwiki\plugin\webdav\core;
+use dokuwiki\plugin\webdav\core\AbstractDirectory;
 
-class Directory extends core\Directory
+class Directory extends AbstractDirectory
 {
     const ROOT      = 'odt';
     const DIRECTORY = 'datadir';

@@ -10,19 +10,20 @@
 
 namespace dokuwiki\plugin\webdav\types\pages;
 
-use dokuwiki\plugin\webdav\core;
+use dokuwiki\plugin\webdav\core\AbstractFile;
+use dokuwiki\plugin\webdav\core\Utils;
 
-class File extends core\File
+class File extends AbstractFile
 {
     public function delete()
     {
-        core\Utils::log('debug', "Delete page");
-        core\Utils::saveWikiText($this->info['id'], null, 'delete');
+        Utils::log('debug', "Delete page");
+        Utils::saveWikiText($this->info['id'], null, 'delete');
     }
 
     public function put($data)
     {
-        core\Utils::log('debug', "Edit page");
-        core\Utils::saveWikiText($this->info['id'], core\Utils::streamReader($data), 'edit');
+        Utils::log('debug', "Edit page");
+        Utils::saveWikiText($this->info['id'], Utils::streamReader($data), 'edit');
     }
 }

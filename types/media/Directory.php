@@ -10,9 +10,11 @@
 
 namespace dokuwiki\plugin\webdav\types\media;
 
-use dokuwiki\plugin\webdav\core;
+use dokuwiki\plugin\webdav\core\AbstractDirectory;
+use Sabre\DAV\Exception\Forbidden;
+use Sabre\DAV\Exception\NotFound;
 
-class Directory extends core\Directory
+class Directory extends AbstractDirectory
 {
     const ROOT      = 'media';
     const DIRECTORY = 'mediadir';
@@ -22,19 +24,25 @@ class Directory extends core\Directory
         global $conf;
 
         if (auth_quickaclcheck($this->ns . ':*') < AUTH_CREATE) {
-            throw new DAV\Exception\Forbidden('Insufficient Permissions');
+            throw new Forbidden('Insufficient Permissions');
         }
 
         // no dir hierarchies
-        $name = strtr($name, array(
+        $sanitized_name = strtr($name, [
             ':' => $conf['sepchar'],
             '/' => $conf['sepchar'],
             ';' => $conf['sepchar'],
-        ));
+        ]);
 
-        $name = cleanID($this->ns . ':' . $name . ':fake'); //add fake pageid
+        $id      = cleanID($this->info['ns'] . ':' . $sanitized_name);
+        $fake_id = cleanID("$id:fake"); //add fake pageid
 
-        io_createNamespace($name, 'media');
+        io_createNamespace($fake_id, 'media');
+
+        // save the original directory name
+        io_saveFile(mediametaFN($id, '.dirname'), serialize([
+            'dirname' => $name,
+        ]));
     }
 
     public function delete()
@@ -42,17 +50,17 @@ class Directory extends core\Directory
         $dir = dirname(mediaFN($this->info['id'] . ':fake'));
 
         if (@!file_exists($dir)) {
-            throw new DAV\Exception\NotFound('Directory does not exist');
+            throw new NotFound('Directory does not exist');
         }
 
         $files = glob("$dir/*");
 
         if (count($files)) {
-            throw new DAV\Exception\Forbidden('Directory not empty');
+            throw new Forbidden('Directory not empty');
         }
 
         if (!rmdir($dir)) {
-            throw new DAV\Exception\Forbidden('Failed to delete directory');
+            throw new Forbidden('Failed to delete directory');
         }
     }
 

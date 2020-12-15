@@ -10,13 +10,16 @@
 
 namespace dokuwiki\plugin\webdav\core;
 
-use Sabre\DAV;
+use Sabre\DAV\File;
 
 /**
  * Base class
  */
-class File extends DAV\File
+class AbstractFile extends File
 {
+
+    public $info = [];
+
     /**
      * DokuWiki File base class
      *
