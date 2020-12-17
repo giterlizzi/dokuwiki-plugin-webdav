@@ -17,7 +17,7 @@ jQuery(document).ready(function () {
         var clients = {
             'nautilus': webdav_url.replace(/^http/, 'dav'),
             'dolphin': webdav_url.replace(/^http/, 'webdav'),
-            'cmd_exe': 'net use Z: ' + webdav_url + ' /user:youruser yourpassword',
+            'cmd_exe': 'net use W: ' + webdav_url + ' /user:youruser yourpassword',
         };
 
         var dialog_html = '<div class="plugin_webdav_dialog">'
