@@ -39,11 +39,76 @@ class admin_plugin_webdav extends DokuWiki_Admin_Plugin
     }
 
     /** @inheritDoc */
+    public function handle()
+    {
+        global $INPUT;
+
+        if (!$_REQUEST['cmd']) {
+            return;
+        }
+
+        if (!checkSecurityToken()) {
+            return;
+        }
+
+        $cmd = $INPUT->extract('cmd')->str('cmd');
+
+        if ($cmd) {
+            $cmd = "cmd_$cmd";
+            $this->$cmd();
+        }
+    }
+
+    public function cmd_unlock()
+    {
+        global $INPUT;
+        global $conf;
+
+        $lock_id     = $INPUT->str('lock');
+        $locks_file  = $conf['cachedir'] . '/webdav.lock';
+        $locked_file = '';
+
+        if (!$lock_id) {
+            msg('No lock provided', -1);
+            return;
+        }
+
+        if ($locks = $this->getLocks()) {
+            foreach ($locks as $id => $lock) {
+                if ($lock->token == $lock_id) {
+                    $locked_file = $lock->uri;
+                    unset($locks[$id]);
+                }
+            }
+
+            if ($locked_file) {
+                if (!io_saveFile($locks_file, serialize($locks))) {
+                    msg('Unlock failed', -1);
+                    return;
+                }
+
+                msg("File $locked_file successfully unlocked", 1);
+            }
+        }
+    }
+
+    /** @inheritDoc */
     public function html()
     {
         echo '<div id="plugin_advanced_export">';
         echo $this->locale_xhtml('intro');
+
+        echo '<form action="" method="post" class="form-inline">';
+
         $this->displayLocks();
+
+        formSecurityToken();
+
+        echo '<input type="hidden" name="do" value="admin" />';
+        echo '<input type="hidden" name="page" value="webdav" />';
+        echo '<input type="hidden" name="cmd" value="unlock" />';
+
+        echo '</form>';
         echo '</div>';
     }
 
@@ -75,7 +140,7 @@ class admin_plugin_webdav extends DokuWiki_Admin_Plugin
             echo "<td>{$this->getLockType($lock->scope)}</td>";
             echo '<td><a class="mediafile mf_' . $pathinfo['extension'] . '" href="' . getBaseURL(true) . 'lib/plugins/webdav/server.php/' . hsc($lock->uri) . '">' . $lock->uri . '</a></td>';
             echo "<td>{$lock->ua}</td>";
-            echo '<td><button type="button" class="btn_unlock_file" data-token="' . $lock->token . '">Unlock</button></td>';
+            echo '<td><button type="submit" class="btn btn-default btn-xs btn_unlock_file" name="lock" value="' . $lock->token . '">Unlock</button></td>';
             echo '</tr>';
         }
         echo '</tbody>';
@@ -90,10 +155,12 @@ class admin_plugin_webdav extends DokuWiki_Admin_Plugin
     private function getLocks()
     {
         global $conf;
-        $locks = array();
 
-        if (file_exists($conf['cachedir'] . '/webdav.lock')) {
-            $locks = unserialize(io_readFile($conf['cachedir'] . '/webdav.lock'));
+        $locks      = [];
+        $locks_file = $conf['cachedir'] . '/webdav.lock';
+
+        if (file_exists($locks_file)) {
+            $locks = unserialize(io_readFile($locks_file));
         }
         return $locks;
     }
