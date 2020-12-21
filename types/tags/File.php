@@ -16,9 +16,9 @@ class File extends AbstractFile
 {
     public function getName()
     {
-        // No ":" NS separator for Windows User
+        // Windows users: Replace NS separator with "U+A789 ꞉ MODIFIER LETTER COLON"
         if (preg_match('/(WebDAVFS|OneNote|Microsoft-WebDAV)/', $_SERVER['HTTP_USER_AGENT'])) {
-            return str_replace(':', '.', $this->info['filename']);
+            return str_replace(':', "\xea\x9e\x89", $this->info['filename']);
         }
         return $this->info['filename'];
     }
