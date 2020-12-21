@@ -172,14 +172,14 @@ class Utils
         $metadir  = mediametaFN($item['ns'], '.dirname');
 
         if (file_exists($metafile)) {
-            $item['metafile'] = $metafile;
             $meta             = unserialize(io_readFile($metafile, false));
+            $item['metafile'] = $metafile;
             $item['filename'] = empty($meta['filename']) ? null : $meta['filename'];
         }
 
         if (file_exists($metadir)) {
-            $item['metadir'] = $metadir;
             $meta            = unserialize(io_readFile($metadir, false));
+            $item['metadir'] = $metadir;
             $item['dirname'] = empty($meta['dirname']) ? null : $meta['dirname'];
         }
 

@@ -17,7 +17,6 @@ use Sabre\DAV\ServerPlugin;
 
 class DokuWikiPlugin extends ServerPlugin
 {
-
     const NS_DOKUWIKI = 'http://dokuwiki.org/ns';
 
     const DAV_ID_PROPERTY           = '{DAV:}id';
@@ -25,10 +24,12 @@ class DokuWikiPlugin extends ServerPlugin
     const DAV_ISHIDDEN_PROPERTY     = '{DAV:}ishidden';
     const DAV_ISFOLDER_PROPERTY     = '{DAV:}isfolder';
     const DAV_ISCOLLECTION_PROPERTY = '{DAV:}iscollection';
-    const DW_DESCRIPTION_PROPERTY   = '{http://dokuwiki.org/ns}description';
-    const DW_TITLE_PROPERTY         = '{http://dokuwiki.org/ns}title';
-    const DW_TAGS_PROPERTY          = '{http://dokuwiki.org/ns}tags';
-    const DW_ID_PROPERTY            = '{http://dokuwiki.org/ns}id';
+    const DAV_CREATIONDATE_PROPERTY = '{DAV:}creationdate';
+
+    const DW_DESCRIPTION_PROPERTY = '{http://dokuwiki.org/ns}description';
+    const DW_TITLE_PROPERTY       = '{http://dokuwiki.org/ns}title';
+    const DW_TAGS_PROPERTY        = '{http://dokuwiki.org/ns}tags';
+    const DW_ID_PROPERTY          = '{http://dokuwiki.org/ns}id';
 
     /**
      * Initializes the plugin
@@ -53,29 +54,36 @@ class DokuWikiPlugin extends ServerPlugin
     {
         $info = $node->info;
 
+        $properties = [];
+
         if ($info['type'] == 'd') {
-            $propFind->handle(self::DAV_ISFOLDER_PROPERTY, 't');
-            $propFind->handle(self::DAV_ISCOLLECTION_PROPERTY, '1');
+            $properties[self::DAV_ISFOLDER_PROPERTY]     = 't';
+            $properties[self::DAV_ISCOLLECTION_PROPERTY] = '1';
         }
 
         if ($info['type'] == 'f') {
             $dw_id = $info['id'];
-            $propFind->handle(self::DAV_ID_PROPERTY, $dw_id);
-            $propFind->handle(self::DW_ID_PROPERTY, $dw_id);
+
+            $properties[self::DAV_ID_PROPERTY] = $dw_id;
+            $properties[self::DW_ID_PROPERTY]  = $dw_id;
 
             if ($info['dir'] == 'datadir') {
                 $dw_meta = p_get_metadata($dw_id);
-                $propFind->handle(self::DAV_DISPLAYNAME_PROPERTY, @$dw_meta['title']);
-                $propFind->handle(self::DAV_ISHIDDEN_PROPERTY, (isHiddenPage($dw_id) ? '1' : '0'));
-                $propFind->handle(self::DW_TITLE_PROPERTY, @$dw_meta['title']);
-                $propFind->handle(self::DW_DESCRIPTION_PROPERTY, @$dw_meta['description']['abstract']);
 
-                if (!plugin_isdisabled('tag')) {
-                    $tag_helper = plugin_load('helper', 'tag');
-                    $tags       = $tag_helper->_getSubjectMetadata($dw_id);
-                    $propFind->handle(self::DW_TAGS_PROPERTY, join(',', $tags));
+                $properties[self::DAV_DISPLAYNAME_PROPERTY]  = @$dw_meta['title'];
+                $properties[self::DAV_ISHIDDEN_PROPERTY]     = (isHiddenPage($dw_id) ? '1' : '0');
+                $properties[self::DAV_CREATIONDATE_PROPERTY] = date(DATE_ISO8601, @$dw_meta['date']['created']);
+                $properties[self::DW_TITLE_PROPERTY]         = @$dw_meta['title'];
+                $properties[self::DW_DESCRIPTION_PROPERTY]   = @$dw_meta['description']['abstract'];
+
+                if ($tag_helper = plugin_load('helper', 'tag')) {
+                    $properties[self::DW_TAGS_PROPERTY] = join(',', $tag_helper->_getSubjectMetadata($dw_id));
                 }
             }
+        }
+
+        foreach ($properties as $propname => $propvalue) {
+            $propFind->handle($propname, $propvalue);
         }
     }
 

@@ -15,6 +15,10 @@ class action_plugin_webdav extends DokuWiki_Action_Plugin
             $controller->register_hook('PLUGIN_WEBDAV_COLLECTIONS', 'BEFORE', $this, 'odtPlugin');
         }
 
+        if (plugin_load('helper', 'tag')) {
+            $controller->register_hook('PLUGIN_WEBDAV_COLLECTIONS', 'BEFORE', $this, 'tagPlugin');
+        }
+
         if ($this->getConf('show_button')) {
             $controller->register_hook('MENU_ITEMS_ASSEMBLY', 'AFTER', $this, 'addMenu');
         }
@@ -25,6 +29,11 @@ class action_plugin_webdav extends DokuWiki_Action_Plugin
     public function odtPlugin(Doku_Event $event, $param)
     {
         $event->data['odt'] = new dokuwiki\plugin\webdav\types\odt\Directory();
+    }
+
+    public function tagPlugin(Doku_Event $event, $param)
+    {
+        $event->data['tags'] = new dokuwiki\plugin\webdav\types\tags\Directory();
     }
 
     public function deleteMeta(Doku_Event $event)

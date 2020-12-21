@@ -30,6 +30,16 @@ class AbstractDirectory extends Collection
         $this->info = $info;
     }
 
+    /**
+     * Return collection class type
+     *
+     * @return string
+     */
+    public function getClassType()
+    {
+        return substr(get_class($this), 0, strrpos(get_class($this), '\\'));
+    }
+
     /** @inheritdoc */
     public function getName()
     {
@@ -47,18 +57,18 @@ class AbstractDirectory extends Collection
     {
         global $conf;
 
-        $children = [];
-        $data     = [];
-        $dir      = str_replace(':', '/', (isset($this->info['id']) ? $this->info['id'] : ':'));
-        $ns_type  = substr(get_class($this), 0, strrpos(get_class($this), '\\'));
+        $children   = [];
+        $data       = [];
+        $dir        = str_replace(':', '/', (isset($this->info['id']) ? $this->info['id'] : ':'));
+        $class_type = $this->getClassType();
 
         search($data, $conf[static::DIRECTORY], ['dokuwiki\plugin\webdav\core\Utils', 'searchCallback'], ['dir' => static::DIRECTORY], $dir);
 
         foreach ($data as $item) {
             if ($item['type'] == 'd') {
-                $child_class = $ns_type . '\\Directory';
+                $child_class = $class_type . '\\Directory';
             } else {
-                $child_class = $ns_type . '\\File';
+                $child_class = $class_type . '\\File';
             }
 
             $children[] = new $child_class($item);

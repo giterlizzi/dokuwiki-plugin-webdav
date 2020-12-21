@@ -73,7 +73,7 @@ try {
     # Fix MS Office Lockroot issue
     # see: https://sabre.io/dav/clients/msoffice/
 
-    if ($helper->getConf('fix_msoffice_lockroot')) {
+    if ($helper && $helper->getConf('fix_msoffice_lockroot')) {
         \Sabre\DAV\Xml\Property\LockDiscovery::$hideLockRoot = true;
     }
 
@@ -105,7 +105,7 @@ try {
     }
 
     # Add browser plugin
-    if ($helper->getConf('browser_plugin')) {
+    if ($helper && $helper->getConf('browser_plugin')) {
         $plugins['Browser'] = new Sabre\DAV\Browser\Plugin();
     } else {
         $plugins['DummyGetResponsePlugin'] = new dokuwiki\plugin\webdav\core\DummyGetResponsePlugin();
