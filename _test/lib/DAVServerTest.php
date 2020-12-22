@@ -58,8 +58,6 @@ class DAVServerTest
         $this->server->exec();
         ob_end_flush();
 
-        # Force output body
-        #$this->server->httpResponse->body = $this->output_buffer;
         return $this->server->httpResponse;
     }
 }
