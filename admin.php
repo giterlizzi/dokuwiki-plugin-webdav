@@ -53,13 +53,25 @@ class admin_plugin_webdav extends DokuWiki_Admin_Plugin
 
         $cmd = $INPUT->extract('cmd')->str('cmd');
 
+        $dispatch = [
+            'unlock' => 'unlockFile',
+        ];
+
         if ($cmd) {
-            $cmd = "cmd_$cmd";
-            $this->$cmd();
+            if (!isset($dispatch[$cmd])) {
+                msg('Unknown command', -1);
+                return;
+            }
+            call_user_func([$this, $dispatch[$cmd]]);
         }
     }
 
-    public function cmd_unlock()
+    /**
+     * Unlock file
+     *
+     * @return bool
+     */
+    public function unlockFile()
     {
         global $INPUT;
         global $conf;

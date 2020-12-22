@@ -58,7 +58,6 @@ global $conf;
 $helper = plugin_load('helper', 'webdav');
 
 try {
-
     # Add pages and media collections
     $collections = [
         'pages' => new dokuwiki\plugin\webdav\types\pages\Directory(),
@@ -140,7 +139,6 @@ try {
     Utils::log('debug', 'Request-Method: {method}', ['method' => @$_SERVER['REQUEST_METHOD']]);
 
     $server->exec();
-
 } catch (Exception $e) {
     Utils::log('fatal', "[{class}] {message} in {file}({line})", [
         'class'   => get_class($e),
