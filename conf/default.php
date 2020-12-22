@@ -11,3 +11,4 @@ $conf['remoteuser']            = '!!not set!!';
 $conf['fix_msoffice_lockroot'] = 0;
 $conf['show_button']           = 0;
 $conf['browser_plugin']        = 0;
+$conf['collections']           = 'pages,media';

@@ -58,11 +58,18 @@ global $conf;
 $helper = plugin_load('helper', 'webdav');
 
 try {
-    # Add pages and media collections
-    $collections = [
-        'pages' => new dokuwiki\plugin\webdav\types\pages\Directory(),
-        'media' => new dokuwiki\plugin\webdav\types\media\Directory(),
-    ];
+    $collections         = [];
+    $enabled_collections = explode(',', $helper->getConf('collections'));
+
+    # Add pages collection
+    if (in_array('pages', $enabled_collections)) {
+        $collections['pages'] = new dokuwiki\plugin\webdav\types\pages\Directory();
+    }
+
+    # Add media collection
+    if (in_array('media', $enabled_collections)) {
+        $collections['media'] = new dokuwiki\plugin\webdav\types\media\Directory();
+    }
 
     # Trigger PLUGIN_WEBDAV_COLLECTIONS event for add custom collections
     trigger_event('PLUGIN_WEBDAV_COLLECTIONS', $collections, null, false);

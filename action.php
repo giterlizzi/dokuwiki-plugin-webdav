@@ -11,11 +11,13 @@ class action_plugin_webdav extends DokuWiki_Action_Plugin
 {
     public function register(Doku_Event_Handler $controller)
     {
-        if (plugin_load('renderer', 'odt_book')) {
+        $enabled_collections = explode(',', $this->getConf('collections'));
+
+        if (in_array('odt', $enabled_collections) && plugin_load('renderer', 'odt_book')) {
             $controller->register_hook('PLUGIN_WEBDAV_COLLECTIONS', 'BEFORE', $this, 'odtPlugin');
         }
 
-        if (plugin_load('helper', 'tag')) {
+        if (in_array('tags', $enabled_collections) && plugin_load('helper', 'tag')) {
             $controller->register_hook('PLUGIN_WEBDAV_COLLECTIONS', 'BEFORE', $this, 'tagPlugin');
         }
 
