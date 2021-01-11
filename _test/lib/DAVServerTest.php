@@ -2,6 +2,8 @@
 
 use Sabre\DAV;
 use Sabre\HTTP;
+use dokuwiki\plugin\webdav\core\DAV\Collection;
+use dokuwiki\plugin\webdav\core\Plugin;
 
 class DAVServerTest
 {
@@ -11,14 +13,17 @@ class DAVServerTest
 
     public function __construct()
     {
-        $collections = [
-            'pages' => new dokuwiki\plugin\webdav\types\pages\Directory(),
-            'media' => new dokuwiki\plugin\webdav\types\media\Directory(),
+        $wiki_collections = [
+            'pages' => new Collection\Pages\Directory(),
+            'media' => new Collection\Media\Directory(),
         ];
 
-        $this->server = new DAV\Server($collections);
+        $this->server = new DAV\Server(new DAV\SimpleCollection('root', [
+            new DAV\SimpleCollection('wiki', $wiki_collections),
+        ]));
+
         $this->server->setBaseUri('/');
-        $this->server->addPlugin(new dokuwiki\plugin\webdav\core\DokuWikiPlugin());
+        $this->server->addPlugin(new Plugin\DokuWiki());
     }
 
     /**

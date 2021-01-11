@@ -20,4 +20,4 @@ jobs:
                   tools: cs2pr, phpcs
 
             - name: run PHP codesniffer
-              run: phpcs -q --runtime-set ignore_warnings_on_exit true --report=checkstyle | cs2pr
+              run: phpcs -q --runtime-set ignore_warnings_on_exit true --report=checkstyle | cs2pr --graceful-warnings

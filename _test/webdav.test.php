@@ -20,19 +20,19 @@ class webdav_plugin_webdav_test extends DokuWikiTest
 
     public function testPropfindMethodStatus()
     {
-        $response = $this->server->request(new HTTP\Request('PROPFIND', '/'));
+        $response = $this->server->request(new HTTP\Request('PROPFIND', '/wiki'));
         $this->assertEquals(207, $response->getStatus());
     }
 
     public function testGetMethodStatus()
     {
-        $response = $this->server->request(new HTTP\Request('GET', '/pages/wiki/dokuwiki.txt'));
+        $response = $this->server->request(new HTTP\Request('GET', '/wiki/pages/wiki/dokuwiki.txt'));
         $this->assertEquals(200, $response->getStatus());
     }
 
     public function testNotFoundStatus()
     {
-        $response = $this->server->request(new HTTP\Request('GET', '/pages/wiki/foo.txt'));
+        $response = $this->server->request(new HTTP\Request('GET', '/wiki/pages/wiki/foo.txt'));
         $this->assertEquals(404, $response->getStatus());
     }
 
@@ -56,7 +56,7 @@ class webdav_plugin_webdav_test extends DokuWikiTest
 </d:propfind>
 EOL;
 
-        $request = new HTTP\Request('PROPFIND', '/pages/wiki/dokuwiki.txt');
+        $request = new HTTP\Request('PROPFIND', '/wiki/pages/wiki/dokuwiki.txt');
         $request->setBody($propfind);
         $response = $this->server->request($request);
 
