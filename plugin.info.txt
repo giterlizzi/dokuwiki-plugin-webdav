@@ -1,7 +1,7 @@
 base   webdav
 author Giuseppe Di Terlizzi
 email  giuseppe.diterlizzi@gmail.com
-date   2020-01-10
+date   2021-01-10
 name   WebDAV DokuWiki Server
 desc   WebDAV Server for DokuWiki
 url    https://www.dokuwiki.org/plugin:webdav
