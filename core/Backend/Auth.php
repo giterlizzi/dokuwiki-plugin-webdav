@@ -1,14 +1,14 @@
 <?php
 
 /**
- * DokuWiki WebDAV Auth Backend
+ * DokuWiki WebDAV Plugin: Auth Backend
  *
  * @author  Giuseppe Di Terlizzi <giuseppe.diterlizzi@gmail.com>
  * @license GPL 2 (http://www.gnu.org/licenses/gpl.html)
  * @link    https://dokuwiki.org/plugin:webdav
  */
 
-namespace dokuwiki\plugin\webdav\core;
+namespace dokuwiki\plugin\webdav\core\Backend;
 
 use dokuwiki\plugin\webdav\core\Utils;
 use Sabre\DAV\Auth\Backend\AbstractBasic;
@@ -26,18 +26,13 @@ class Auth extends AbstractBasic
     protected function validateUserPass($username, $password)
     {
         global $auth;
-        global $conf;
-        global $helper;
+
+        $helper = plugin_load('helper', 'webdav');
 
         $check = $auth->checkPass($username, $password);
 
-        Utils::log('debug', '[Auth] {check} password for {username} user', [
-            'username' => $username,
-            'check'    => ($check ? 'Valid' : 'Invalid'),
-        ]);
-
         if (!$helper->hasAccess()) {
-            Utils::log('debug', '[Auth] Access denied. See WebDAV "remoteuser" config');
+            Utils::log('fatal', 'Unauthorized. Check webdav.remoteuser option');
             return false;
         }
 

@@ -14,11 +14,11 @@ class action_plugin_webdav extends DokuWiki_Action_Plugin
         $enabled_collections = explode(',', $this->getConf('collections'));
 
         if (in_array('odt', $enabled_collections) && plugin_load('renderer', 'odt_book')) {
-            $controller->register_hook('PLUGIN_WEBDAV_COLLECTIONS', 'BEFORE', $this, 'odtPlugin');
+            $controller->register_hook('PLUGIN_WEBDAV_WIKI_COLLECTIONS', 'BEFORE', $this, 'odtPlugin');
         }
 
         if (in_array('tags', $enabled_collections) && plugin_load('helper', 'tag')) {
-            $controller->register_hook('PLUGIN_WEBDAV_COLLECTIONS', 'BEFORE', $this, 'tagPlugin');
+            $controller->register_hook('PLUGIN_WEBDAV_WIKI_COLLECTIONS', 'BEFORE', $this, 'tagPlugin');
         }
 
         if ($this->getConf('show_button')) {
@@ -30,12 +30,12 @@ class action_plugin_webdav extends DokuWiki_Action_Plugin
 
     public function odtPlugin(Doku_Event $event, $param)
     {
-        $event->data['odt'] = new dokuwiki\plugin\webdav\types\odt\Directory();
+        $event->data[] = new dokuwiki\plugin\webdav\core\DAV\Collection\ODT\Directory();
     }
 
     public function tagPlugin(Doku_Event $event, $param)
     {
-        $event->data['tags'] = new dokuwiki\plugin\webdav\types\tags\Directory();
+        $event->data[] = new dokuwiki\plugin\webdav\core\DAV\Collection\Tags\Directory();
     }
 
     public function deleteMeta(Doku_Event $event)

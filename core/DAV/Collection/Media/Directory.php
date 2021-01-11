@@ -8,9 +8,9 @@
  * @license  GPL 2 (http://www.gnu.org/licenses/gpl.html)
  */
 
-namespace dokuwiki\plugin\webdav\types\media;
+namespace dokuwiki\plugin\webdav\core\DAV\Collection\Media;
 
-use dokuwiki\plugin\webdav\core\AbstractDirectory;
+use dokuwiki\plugin\webdav\core\DAV\AbstractDirectory;
 use Sabre\DAV\Exception\Forbidden;
 use Sabre\DAV\Exception\NotFound;
 

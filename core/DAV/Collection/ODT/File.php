@@ -8,9 +8,9 @@
  * @license  GPL 2 (http://www.gnu.org/licenses/gpl.html)
  */
 
-namespace dokuwiki\plugin\webdav\types\odt;
+namespace dokuwiki\plugin\webdav\core\DAV\Collection\ODT;
 
-use dokuwiki\plugin\webdav\core\AbstractFile;
+use dokuwiki\plugin\webdav\core\DAV\AbstractFile;
 use Sabre\DAV\Exception\Forbidden;
 
 class File extends AbstractFile

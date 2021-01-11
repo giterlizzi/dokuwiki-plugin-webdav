@@ -37,7 +37,7 @@ class MenuItem extends AbstractItem
         }
 
         $attr['class'] .= ' plugin_webdav ';
-        $attr['data-webdav-url'] = getBaseURL(true) . 'lib/plugins/webdav/server.php/';
+        $attr['data-webdav-url'] = getBaseURL(true) . 'lib/plugins/webdav/server.php/wiki/';
 
         return $attr;
     }

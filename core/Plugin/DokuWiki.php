@@ -1,21 +1,21 @@
 <?php
 
 /**
- * DokuWiki plugin for Sabre DAV
+ * DokuWiki WebDAV Plugin: Plugin for SabreDAV
  *
  * @copyright Copyright (C) 2019-2020
  * @author Giuseppe Di Terlizzi (giuseppe.diterlizzi@gmail.com)
  * @license GNU GPL 2
  */
 
-namespace dokuwiki\plugin\webdav\core;
+namespace dokuwiki\plugin\webdav\core\Plugin;
 
 use Sabre\DAV\Inode;
 use Sabre\DAV\PropFind;
 use Sabre\DAV\Server;
 use Sabre\DAV\ServerPlugin;
 
-class DokuWikiPlugin extends ServerPlugin
+class DokuWiki extends ServerPlugin
 {
     const NS_DOKUWIKI = 'http://dokuwiki.org/ns';
 
@@ -52,6 +52,10 @@ class DokuWikiPlugin extends ServerPlugin
      */
     public function propFind(PropFind $propFind, INode $node)
     {
+        if (!isset($node->info)) {
+            return;
+        }
+
         $info = $node->info;
 
         $properties = [];
@@ -85,6 +89,19 @@ class DokuWikiPlugin extends ServerPlugin
         foreach ($properties as $propname => $propvalue) {
             $propFind->handle($propname, $propvalue);
         }
+    }
+
+    /**
+     * Returns a plugin name.
+     *
+     * Using this name other plugins will be able to access other plugins
+     * using Sabre\DAV\Server::getPlugin
+     *
+     * @return string
+     */
+    public function getPluginName()
+    {
+        return 'dokuwiki';
     }
 
     /**

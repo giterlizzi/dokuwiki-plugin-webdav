@@ -24,7 +24,7 @@
  *
  */
 
-namespace dokuwiki\plugin\webdav\core;
+namespace dokuwiki\plugin\webdav\core\Plugin;
 
 use Sabre\DAV\INode;
 use Sabre\DAV\Locks\LockInfo;
@@ -46,7 +46,7 @@ use Sabre\HTTP\ResponseInterface;
  *
  * @see https://github.com/owncloud/core/issues/17732
  */
-class FakeLockerPlugin extends ServerPlugin
+class FakeLocker extends ServerPlugin
 {
     /** @var \Sabre\DAV\Server */
     private $server;

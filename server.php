@@ -52,99 +52,15 @@ use dokuwiki\plugin\webdav\core\Utils;
 
 session_write_close();
 
-global $helper;
-global $conf;
+if (strpos(@ini_get('disable_functions'), 'set_time_limit') === false) {
+    @set_time_limit(0);
+}
+ignore_user_abort(true);
 
-$helper = plugin_load('helper', 'webdav');
+$base_uri = DOKU_REL . 'lib/plugins/webdav/server.php/';
 
 try {
-    $collections         = [];
-    $enabled_collections = explode(',', $helper->getConf('collections'));
-
-    # Add pages collection
-    if (in_array('pages', $enabled_collections)) {
-        $collections['pages'] = new dokuwiki\plugin\webdav\types\pages\Directory();
-    }
-
-    # Add media collection
-    if (in_array('media', $enabled_collections)) {
-        $collections['media'] = new dokuwiki\plugin\webdav\types\media\Directory();
-    }
-
-    # Trigger PLUGIN_WEBDAV_COLLECTIONS event for add custom collections
-    trigger_event('PLUGIN_WEBDAV_COLLECTIONS', $collections, null, false);
-
-    Utils::log('debug', 'Loaded collections: {collections}', ['collections' => implode(', ', array_keys($collections))]);
-
-    # Fix MS Office Lockroot issue
-    # see: https://sabre.io/dav/clients/msoffice/
-
-    if ($helper && $helper->getConf('fix_msoffice_lockroot')) {
-        \Sabre\DAV\Xml\Property\LockDiscovery::$hideLockRoot = true;
-    }
-
-    $server = new Sabre\DAV\Server($collections);
-
-    $server->setBaseUri(DOKU_REL . 'lib/plugins/webdav/server.php');
-
-    # Hide SabreDAV version
-    $server::$exposeVersion              = false;
-    $server->enablePropfindDepthInfinity = true;
-
-    $plugins = [
-        'Mount'               => new Sabre\DAV\Mount\Plugin(),
-        'Locks'               => new Sabre\DAV\Locks\Plugin(new dokuwiki\plugin\webdav\core\LocksFileBackend($conf['cachedir'] . '/webdav.lock')),
-        'TemporaryFileFilter' => new Sabre\DAV\TemporaryFileFilterPlugin($conf['tmpdir'] . '/webdav'),
-        'DokuWiki'            => new dokuwiki\plugin\webdav\core\DokuWikiPlugin(),
-        'Exception'           => new dokuwiki\plugin\webdav\core\ExceptionPlugin(),
-    ];
-
-    $extra_tmp_file_patterns = [
-        '/^~\$.*$/', // MSOffice temp files
-        '/^.*.tmp$/', // Office .tmp files
-        '/^.*\.wbk$/', // Word backup files
-    ];
-
-    # Add extra temporary file patterns
-    foreach ($extra_tmp_file_patterns as $pattern) {
-        $plugins['TemporaryFileFilter']->temporaryFilePatterns[] = $pattern;
-    }
-
-    # Add browser plugin
-    if ($helper && $helper->getConf('browser_plugin')) {
-        $plugins['Browser'] = new Sabre\DAV\Browser\Plugin();
-    } else {
-        $plugins['DummyGetResponsePlugin'] = new dokuwiki\plugin\webdav\core\DummyGetResponsePlugin();
-    }
-
-    # Some WebDAV clients do require Class 2 WebDAV support (locking), since
-    # we do not provide locking we emulate it using a fake locking plugin.
-    if (preg_match('/(WebDAVFS|OneNote|Microsoft-WebDAV)/', $_SERVER['HTTP_USER_AGENT'])) {
-        $plugins['FakeLockerPlugin'] = new dokuwiki\plugin\webdav\core\FakeLockerPlugin();
-    }
-
-    # Enable Basic Authentication
-    if ($conf['useacl']) {
-        $auth_backend = new dokuwiki\plugin\webdav\core\Auth();
-        $auth_backend->setRealm(hsc($conf['title']) . ' - DokuWiki WebDAV');
-
-        $plugins['Auth'] = new Sabre\DAV\Auth\Plugin($auth_backend);
-    }
-
-    # Trigger PLUGIN_WEBDAV_PLUGINS event for add custom plugins
-    trigger_event('PLUGIN_WEBDAV_PLUGINS', $plugins, null, false);
-
-    Utils::log('debug', 'Loaded plugins: {plugins}', ['plugins' => implode(', ', array_keys($plugins))]);
-
-    foreach ($plugins as $name => $plugin) {
-        $server->addPlugin($plugin);
-    }
-
-    Utils::log('debug', 'User-Agent: {agent}', ['agent' => @$_SERVER['HTTP_USER_AGENT']]);
-    Utils::log('debug', 'Remote-User: {user}', ['user' => @$_SERVER['REMOTE_USER']]);
-    Utils::log('debug', 'Request-URI: {uri}', ['uri' => @$_SERVER['REQUEST_URI']]);
-    Utils::log('debug', 'Request-Method: {method}', ['method' => @$_SERVER['REQUEST_METHOD']]);
-
+    $server = new dokuwiki\plugin\webdav\core\Server($base_uri);
     $server->exec();
 } catch (Exception $e) {
     Utils::log('fatal', "[{class}] {message} in {file}({line})", [

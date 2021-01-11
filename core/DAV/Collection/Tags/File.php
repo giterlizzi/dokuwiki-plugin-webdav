@@ -8,9 +8,9 @@
  * @license  GPL 2 (http://www.gnu.org/licenses/gpl.html)
  */
 
-namespace dokuwiki\plugin\webdav\types\tags;
+namespace dokuwiki\plugin\webdav\core\DAV\Collection\Tags;
 
-use dokuwiki\plugin\webdav\core\AbstractFile;
+use dokuwiki\plugin\webdav\core\DAV\AbstractFile;
 
 class File extends AbstractFile
 {

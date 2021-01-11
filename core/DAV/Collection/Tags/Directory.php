@@ -8,9 +8,9 @@
  * @link    https://dokuwiki.org/plugin:webdav
  */
 
-namespace dokuwiki\plugin\webdav\types\tags;
+namespace dokuwiki\plugin\webdav\core\DAV\Collection\Tags;
 
-use dokuwiki\plugin\webdav\core\AbstractDirectory;
+use dokuwiki\plugin\webdav\core\DAV\AbstractDirectory;
 
 class Directory extends AbstractDirectory
 {

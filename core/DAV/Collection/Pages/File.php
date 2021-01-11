@@ -8,9 +8,9 @@
  * @license  GPL 2 (http://www.gnu.org/licenses/gpl.html)
  */
 
-namespace dokuwiki\plugin\webdav\types\pages;
+namespace dokuwiki\plugin\webdav\core\DAV\Collection\Pages;
 
-use dokuwiki\plugin\webdav\core\AbstractFile;
+use dokuwiki\plugin\webdav\core\DAV\AbstractFile;
 use dokuwiki\plugin\webdav\core\Utils;
 
 class File extends AbstractFile

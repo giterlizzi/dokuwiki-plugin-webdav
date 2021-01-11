@@ -1,7 +1,5 @@
 <?php
 
-namespace dokuwiki\plugin\webdav\core;
-
 /**
  * DokuWiki WebDAV Plugin: Lock file backend for Sabre DAV
  *
@@ -10,9 +8,11 @@ namespace dokuwiki\plugin\webdav\core;
  * @license GNU GPL 2
  */
 
+namespace dokuwiki\plugin\webdav\core\Backend;
+
 use Sabre\DAV;
 
-class LocksFileBackend extends DAV\Locks\Backend\File
+class LocksFile extends DAV\Locks\Backend\File
 {
     /**
      * Locks a uri

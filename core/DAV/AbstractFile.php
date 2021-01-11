@@ -1,14 +1,14 @@
 <?php
 
 /**
- * DokuWiki WebDAV File Base Class
+ * DokuWiki WebDAV Plugin: File Base Class
  *
  * @author  Giuseppe Di Terlizzi <giuseppe.diterlizzi@gmail.com>
  * @license GPL 2 (http://www.gnu.org/licenses/gpl.html)
  * @link    https://dokuwiki.org/plugin:webdav
  */
 
-namespace dokuwiki\plugin\webdav\core;
+namespace dokuwiki\plugin\webdav\core\DAV;
 
 use Sabre\DAV\File;
 

@@ -8,14 +8,14 @@
  * @license GNU GPL 2
  */
 
-namespace dokuwiki\plugin\webdav\core;
+namespace dokuwiki\plugin\webdav\core\Plugin;
 
 use Sabre\DAV\Server;
 use Sabre\DAV\ServerPlugin;
 use Sabre\HTTP\RequestInterface;
 use Sabre\HTTP\ResponseInterface;
 
-class DummyGetResponsePlugin extends ServerPlugin
+class DummyGetResponse extends ServerPlugin
 {
     /** @var \Sabre\DAV\Server */
     protected $server;

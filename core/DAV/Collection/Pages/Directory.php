@@ -8,14 +8,14 @@
  * @license  GPL 2 (http://www.gnu.org/licenses/gpl.html)
  */
 
-namespace dokuwiki\plugin\webdav\types\pages;
+namespace dokuwiki\plugin\webdav\core\DAV\Collection\Pages;
 
 use dokuwiki\plugin\webdav;
 use dokuwiki\plugin\webdav\core\Utils;
 use Sabre\DAV\Exception\Forbidden;
 use Sabre\DAV\Exception\NotFound;
 
-class Directory extends webdav\core\AbstractDirectory
+class Directory extends webdav\core\DAV\AbstractDirectory
 {
     const ROOT      = 'pages';
     const DIRECTORY = 'datadir';

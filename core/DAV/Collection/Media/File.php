@@ -8,9 +8,9 @@
  * @license  GPL 2 (http://www.gnu.org/licenses/gpl.html)
  */
 
-namespace dokuwiki\plugin\webdav\types\media;
+namespace dokuwiki\plugin\webdav\core\DAV\Collection\Media;
 
-use dokuwiki\plugin\webdav\core\AbstractFile;
+use dokuwiki\plugin\webdav\core\DAV\AbstractFile;
 use dokuwiki\plugin\webdav\core\Utils;
 use Sabre\DAV\Exception\Forbidden;
 use Sabre\DAV\Exception\UnsupportedMediaType;
@@ -25,7 +25,7 @@ class File extends AbstractFile
             throw new Forbidden('You are not allowed to delete this file');
         }
 
-        $res = media_delete($this->info['id'], $acl_check);
+        $res = media_delete($this->info['id'], null);
 
         // TODO remove metafile in attic ?
         //if ($metafile = $this->info['metafile']) {

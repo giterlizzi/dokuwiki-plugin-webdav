@@ -1,7 +1,7 @@
 <?php
 
 /**
- * DokuWiki WebDAV Util Class
+ * DokuWiki WebDAV Plugin: Util Class
  *
  * @author  Giuseppe Di Terlizzi <giuseppe.diterlizzi@gmail.com>
  * @license GPL 2 (http://www.gnu.org/licenses/gpl.html)
@@ -128,12 +128,12 @@ class Utils
     /**
      * Search callback
      *
-     * @param array $data
-     * @param string $base
-     * @param string $file
-     * @param string $type
+     * @param array   $data
+     * @param string  $base
+     * @param string  $file
+     * @param string  $type
      * @param integer $lvl
-     * @param array $opts
+     * @param array   $opts
      *
      * @return array
      */
@@ -141,46 +141,56 @@ class Utils
     {
         $item = [];
 
-        $is_dir = ($type == 'd');
-
-        $item['id']   = pathID($file, $is_dir);
-        $item['type'] = $type;
-        $item['dir']  = $opts['dir'];
-
-        if ($is_dir) {
-            $item['perm']  = auth_quickaclcheck($item['id'] . ':*');
-            $item['ns']    = $item['id'];
-            $item['mtime'] = filemtime("$base/$file");
-        } else {
-            $item['path']      = (!empty($opts['dir']) && $opts['dir'] == 'mediadir') ? mediaFN($item['id']) : wikiFN($item['id']);
-            $item['mime_type'] = (!empty($opts['dir']) && $opts['dir'] == 'mediadir') ? mime_content_type($item['path']) : null;
-            $item['ns']        = getNS($item['id']);
-            $item['size']      = filesize($item['path']);
-            $item['mtime']     = filemtime($item['path']);
-            $item['perm']      = auth_quickaclcheck($item['id']);
-            $item['hash']      = sha1_file($item['path']);
-            $item['file']      = basename($file);
+        if (!isset($opts['dir'])) {
+            $opts['dir'] = 'datadir';
         }
 
-        $item['filename'] = $item['file'];
-        $item['dirname']  = $item['ns'];
+        $is_dir      = ($type == 'd');
+        $is_mediadir = ($opts['dir'] == 'mediadir');
 
+        $item['id']       = pathID($file, $is_dir);
+        $item['type']     = $type;
+        $item['dir']      = $opts['dir'];
         $item['metafile'] = null;
         $item['metadir']  = null;
 
-        $metafile = mediametaFN($item['id'], '.filename');
-        $metadir  = mediametaFN($item['ns'], '.dirname');
-
-        if (file_exists($metafile)) {
-            $meta             = unserialize(io_readFile($metafile, false));
-            $item['metafile'] = $metafile;
-            $item['filename'] = empty($meta['filename']) ? null : $meta['filename'];
+        if ($is_dir) {
+            $item['perm']    = auth_quickaclcheck($item['id'] . ':*');
+            $item['ns']      = $item['id'];
+            $item['mtime']   = filemtime("$base/$file");
+            $item['dirname'] = $item['ns'];
+        } else {
+            $item['path']      = ($is_mediadir) ? mediaFN($item['id']) : wikiFN($item['id']);
+            $item['mime_type'] = ($is_mediadir) ? mime_content_type($item['path']) : null;
+            $item['perm']      = auth_quickaclcheck($item['id']);
+            $item['ns']        = getNS($item['id']);
+            $item['size']      = filesize($item['path']);
+            $item['mtime']     = filemtime($item['path']);
+            $item['hash']      = sha1_file($item['path']);
+            $item['file']      = basename($file);
+            $item['filename']  = $item['file'];
+            $item['dirname']   = $item['ns'];
         }
 
-        if (file_exists($metadir)) {
-            $meta            = unserialize(io_readFile($metadir, false));
-            $item['metadir'] = $metadir;
-            $item['dirname'] = empty($meta['dirname']) ? null : $meta['dirname'];
+        /**
+         * Use mediameta for fetch original directory and file name:
+         *
+         *   <ID>.filename    array ( filename => 'Original File Name' )
+         *   <NS>.dirname     array ( dirname  => 'Original Directory Name' )
+         */
+        if ($is_mediadir) {
+            $metafile = mediametaFN($item['id'], '.filename');
+            $metadir  = mediametaFN($item['ns'], '.dirname');
+
+            if (file_exists($metafile) && $meta = unserialize(io_readFile($metafile, false))) {
+                $item['metafile'] = $metafile;
+                $item['filename'] = $meta['filename'];
+            }
+
+            if (file_exists($metadir) && $meta = unserialize(io_readFile($metadir, false))) {
+                $item['metadir'] = $metadir;
+                $item['dirname'] = $meta['dirname'];
+            }
         }
 
         if ($item['perm'] < AUTH_READ) {
